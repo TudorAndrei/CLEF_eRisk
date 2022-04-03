@@ -15,7 +15,7 @@ from torch.optim import Adam
 # from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchmetrics.classification.accuracy import Accuracy
 from torchmetrics.functional.classification.f_beta import f1_score
-from transformers.models.auto.modeling_auto import AutoModelForSequenceClassification
+from transformers import AutoModel
 
 
 class Base(LightningModule):
@@ -24,7 +24,7 @@ class Base(LightningModule):
         self.bert_output_size = 768
         print(model_name)
         self.lr = 0.003
-        self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
+        self.model = AutoModel.from_pretrained(model_name)
         self.classifier = Linear(in_features=768, out_features=1, bias=True)
         self.criterion = BCEWithLogitsLoss()
 
@@ -33,9 +33,8 @@ class Base(LightningModule):
             param.requires_grad = False
 
     def forward(self, ids, mask):
-        out = self.model(input_ids=ids, attention_mask=mask)
-        out = out[0]
-        # out = out[:, 0]
+        out = self.model(ids, attention_mask=mask)
+        out = out[0][:, 0, :]
         out = self.classifier(out)
         return out
 
@@ -56,13 +55,14 @@ class Base(LightningModule):
         output = self(ids, mask)
         output = torch.squeeze(output, dim=1)
         loss = self.criterion(output, labels)
-        f1 = f1_score(output, labels.int())
-        self.log("train/loss", loss, prog_bar=True, on_epoch=True, on_step=False)
-        return {"loss": loss, "f1": f1}
+        self.log("train/loss", loss, on_epoch=True, on_step=False)
+        return loss
 
-    def training_epoch_end(self, out):
-        f1 = torch.stack([x["f1"] for x in out]).mean()
-        self.log("train/f1", f1, prog_bar=True, on_epoch=True, on_step=False)
+    # def training_epoch_end(self, out):
+    #     output = torch.stack([x["outputs"] for x in out]).mean()
+    #     labels = torch.stack([x["labels"] for x in out]).mean()
+    #     f1 = f1_score(preds=output, target=labels)
+    #     self.log("train/f1", f1, prog_bar=True)
 
     # def validation_step(self, batch, _):
     #     ids, mask, labels = batch[""], batch["labels"]
@@ -90,21 +90,13 @@ class Base(LightningModule):
 class DistilRoBERTa(Base):
     def __init__(self, model: str) -> None:
         super().__init__(model)
-        self.classifier = self.model.classifier
-        self.model = self.model.roberta
-        print(self.model)
-        self.freeze_model(self.model)
-        self.classifier.out_proj = Linear(in_features=768, out_features=1, bias=True)
-        print(self.classifier)
+        # self.freeze_model(self.model)
+
 
 class SqueezeBERT(Base):
     def __init__(self, model: str) -> None:
         super().__init__(model)
-        self.model = self.model.transformer
         self.freeze_model(self.model)
-        print(self.model)
-        self.classifier = Linear(in_features=768, out_features=1, bias=True)
-        print(self.classifier)
 
 
 class EnsembleVotingModel(LightningModule):

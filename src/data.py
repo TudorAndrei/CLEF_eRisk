@@ -1,19 +1,9 @@
 import os
-import os.path as osp
-from abc import ABC, abstractmethod
-from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Type
+from typing import Optional, Type
 
 import torch
-import torchvision.transforms as T
-from pytorch_lightning import LightningDataModule, Trainer, seed_everything
-from pytorch_lightning.core.lightning import LightningModule
-from pytorch_lightning.loops.base import Loop
-from pytorch_lightning.loops.fit_loop import FitLoop
-from pytorch_lightning.trainer.states import TrainerFn
-from sklearn.model_selection import KFold
-from torch.nn import functional as F
+from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader, Dataset, random_split
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.dataset import Dataset, Subset
@@ -48,11 +38,12 @@ class BaseDataset(Dataset):
             text = " ".join(f.readlines())
         text = self.tokenizer.encode_plus(
             text,
-            None,
             add_special_tokens=True,
             max_length=512,
             padding="max_length",
             return_token_type_ids=True,
+            # return_tensors='pt',
+            # return_attention_mask=True,
             truncation=True,
         )
         return {

@@ -9,10 +9,9 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 let s:shortmess_save = &shortmess
 set shortmess=aoO
-badd +75 ~/projects/erisk/src/data.py
-badd +1 ~/projects/erisk/src/main.py
-badd +57 ~/projects/erisk/src/models.py
-badd +1 utils.py
+badd +87 ~/projects/erisk/src/data.py
+badd +32 ~/projects/erisk/src/main.py
+badd +54 ~/projects/erisk/src/models.py
 argglobal
 %argdel
 edit ~/projects/erisk/src/main.py
@@ -44,13 +43,13 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-29
+30
 normal! zo
-let s:l = 43 - ((30 * winheight(0) + 24) / 49)
+let s:l = 1 - ((0 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 43
+keepjumps 1
 normal! 0
 wincmd w
 argglobal
@@ -69,36 +68,34 @@ setlocal fdn=20
 setlocal fen
 22
 normal! zo
-43
-normal! zo
 91
 normal! zo
-101
+97
 normal! zo
-111
+103
 normal! zo
-112
+104
 normal! zc
-111
+103
 normal! zc
-129
+121
 normal! zo
-130
-normal! zc
-137
-normal! zc
-140
-normal! zc
-143
+122
 normal! zc
 129
 normal! zc
-let s:l = 57 - ((24 * winheight(0) + 24) / 49)
+132
+normal! zc
+135
+normal! zc
+121
+normal! zc
+let s:l = 103 - ((40 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 57
-normal! 044|
+keepjumps 103
+normal! 0
 wincmd w
 exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
 exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)
