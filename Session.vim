@@ -9,14 +9,14 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 let s:shortmess_save = &shortmess
 set shortmess=aoO
-badd +77 ~/projects/erisk/src/data.py
-badd +41 ~/projects/erisk/src/main.py
-badd +95 src/pure_pytorch.py
+badd +25 ~/projects/erisk/src/data.py
+badd +14 src/main.py
+badd +84 src/models.py
 argglobal
 %argdel
-edit src/pure_pytorch.py
+edit ~/projects/erisk/src/data.py
 argglobal
-balt ~/projects/erisk/src/main.py
+balt src/models.py
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -25,21 +25,11 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-69
-normal! zo
-70
-normal! zo
-93
-normal! zo
-94
-normal! zo
-112
-normal! zo
-let s:l = 95 - ((11 * winheight(0) + 24) / 49)
+let s:l = 1 - ((0 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 95
+keepjumps 1
 normal! 0
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
