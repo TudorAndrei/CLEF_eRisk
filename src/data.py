@@ -1,11 +1,9 @@
 import os
-from dataclasses import dataclass
-from typing import Optional, Type
+from typing import Optional
 
 import torch
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader, Dataset, random_split
-from torch.utils.data.dataset import Subset
 from transformers import RobertaTokenizerFast
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 
@@ -17,7 +15,7 @@ class BaseDataset(Dataset):
         model_name: str = "distilroberta-base",
         ground_truth: str = "risk_golden_truth.txt",
         processed_folder: str = "processed",
-        roberta_pretrained_path: str = None,
+        roberta_pretrained_path: Optional[str] = None,
     ):
         self.labels = []
         self.ext = ".txt"
