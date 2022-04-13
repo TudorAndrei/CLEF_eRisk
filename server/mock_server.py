@@ -1,5 +1,7 @@
+from json import loads
+
 from faker import Faker
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 fake = Faker()
 
@@ -28,9 +30,14 @@ def generate_writing(number):
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def hello_world():
-    global number
-    writings = generate_writing(number)
-    number += 1
-    return jsonify(writings)
+    if request.method == "GET":
+        global number
+        writings = generate_writing(number)
+        number += 1
+        return jsonify(writings)
+    if request.method == "POST":
+        data = request.form
+        print(data)
+        return jsonify({"message": "Success"})
