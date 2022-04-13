@@ -20,13 +20,13 @@ from models import Transformer
 logging.set_verbosity_error()
 config = dotenv_values(".env")
 
-# log.getLogger("pytorch_lightning").setLevel(log.WARNING)
-# os.environ["TOKENIZERS_PARALLELISM"] = "false"
-# seed_everything(42)
+log.getLogger("pytorch_lightning").setLevel(log.WARNING)
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+seed_everything(42)
 
-BATCH_SIZE = 2
+BATCH_SIZE = 32
 NW = 8
-EPOCHS = 1
+EPOCHS = 100
 web_hook = config["DISCORD_WEBHOOK"]
 
 
@@ -43,31 +43,31 @@ if __name__ == "__main__":
     data = DataModule(
         ground_truth="risk_golden_truth_chunks.txt", folder="chunked", **params
     )
-
-    model = Transformer()
+    model = Transformer(
+        ntokens=30000,
+        emsize=128,
+        d_hid=128,
+        nlayers=2,
+        nhead=4,
+        dropout=0.2,
+    )
     trainer = Trainer(
         # fast_dev_run=True,
         detect_anomaly=True,
-        # gpus=1,
+        gpus=1,
         logger=TensorBoardLogger("logs", name=f"model_{model_name}"),
         max_epochs=EPOCHS,
         callbacks=[
-            # ModelCheckpoint(
-            #     monitor="val/val_loss",
-            #     mode="min",
-            #     dirpath=f"models/{model_name}_3",
-            #     filename="bert-val_loss{val/val_loss:.2f}",
-            #     auto_insert_metric_name=False,
-            # ),
-            # NotificationCallback(
-            #     senders=[
-            #         DiscordSender(
-            #             webhook_url=web_hook,
-            #         )
-            #     ]
-            # ),
-            # # LearningRateMonitor(logging_interval="step"),
-            # EarlyStopping(monitor="val/val_loss", patience=5),
+            ModelCheckpoint(
+                monitor="val/val_loss",
+                mode="min",
+                dirpath=f"models/{model_name}_3",
+                filename="model_val_loss{val/val_loss:.2f}",
+                auto_insert_metric_name=False,
+            ),
+            NotificationCallback(senders=[DiscordSender(webhook_url=web_hook)]),
+            LearningRateMonitor(logging_interval="step"),
+            EarlyStopping(monitor="val/val_loss", patience=10),
         ],
     )
     trainer.fit(model, data)

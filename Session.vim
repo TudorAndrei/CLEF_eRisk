@@ -9,12 +9,11 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 let s:shortmess_save = &shortmess
 set shortmess=aoO
-badd +35 src/data.py
-badd +47 src/main.py
-badd +63 src/models.py
+badd +70 src/main.py
+badd +109 src/models.py
 argglobal
 %argdel
-edit src/data.py
+edit src/main.py
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
@@ -31,9 +30,9 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-wincmd =
+exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
+exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)
 argglobal
-balt src/models.py
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -42,18 +41,18 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-63
+34
 normal! zo
-95
+56
 normal! zo
-103
+61
 normal! zo
-let s:l = 14 - ((11 * winheight(0) + 24) / 49)
+let s:l = 70 - ((45 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 14
-normal! 013|
+keepjumps 70
+normal! 061|
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/models.py", ":p")) | buffer src/models.py | else | edit src/models.py | endif
@@ -69,26 +68,33 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-21
+22
 normal! zo
-43
+23
 normal! zo
-75
+41
 normal! zo
-97
+51
 normal! zo
-127
+74
 normal! zo
-127
-normal! zc
-let s:l = 63 - ((11 * winheight(0) + 24) / 49)
+96
+normal! zo
+114
+normal! zo
+117
+normal! zo
+147
+normal! zo
+let s:l = 107 - ((10 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 63
-normal! 038|
+keepjumps 107
+normal! 016|
 wincmd w
-wincmd =
+exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
+exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

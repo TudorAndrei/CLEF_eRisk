@@ -12,6 +12,7 @@ from torch.nn.modules.loss import BCEWithLogitsLoss
 from torch.nn.modules.sparse import Embedding
 from torch.nn.modules.transformer import TransformerEncoder, TransformerEncoderLayer
 from torch.optim import Adam
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 # from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchmetrics.functional.classification.f_beta import f1_score
@@ -26,15 +27,12 @@ class PositionalEncoding(Module):
         div_term = torch.exp(
             torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model)
         )
-        self.pe = torch.zeros(vocab_size, 1, d_model)
-        self.pe[:, 0, 0::2] = torch.sin(position * div_term)
-        self.pe[:, 0, 1::2] = torch.cos(position * div_term)
+        pe = torch.zeros(vocab_size, 1, d_model)
+        pe[:, 0, 0::2] = torch.sin(position * div_term)
+        pe[:, 0, 1::2] = torch.cos(position * div_term)
+        self.register_buffer("pe", pe)
 
     def forward(self, x: Tensor) -> Tensor:
-        """
-        Args:
-            x: Tensor, shape [seq_len, batch_size, embedding_dim]
-        """
         x = x + self.pe[: x.size(0)]
         return self.dropout(x)
 
@@ -55,13 +53,14 @@ class TransformerModel(torch.nn.Module):
         self.encoder = Embedding(ntoken, d_model)
         self.pos_encoder = PositionalEncoding(d_model, dropout, ntoken)
 
-        encoder_layers = TransformerEncoderLayer(d_model, nhead, d_hid, dropout, batch_first=True)
+        encoder_layers = TransformerEncoderLayer(
+            d_model, nhead, d_hid, dropout, batch_first=True
+        )
         self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
         self.d_model = d_model
 
         # self.decoder = Linear(d_model * seq_len, 1)
         self.decoder = Linear(d_model, 1)
-
 
         self.init_weights()
 
@@ -105,22 +104,43 @@ class Transformer(LightningModule):
     ) -> None:
         super().__init__()
         self.model = TransformerModel(ntokens, emsize, nhead, d_hid, nlayers, dropout)
-        print(self.model)
         self.criterion = BCEWithLogitsLoss()
-        self.lr = 0.003
+        self.lr = 0.03
 
     def forward(self, x):
         return self.model(x)
 
     def configure_optimizers(self):
         optimizer = Adam(self.model.parameters(), lr=self.lr)
-        return optimizer
+        scheduler = ReduceLROnPlateau(optimizer, threshold=5, factor=0.5)
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": {
+                "scheduler": scheduler,
+                "monitor": "val/val_loss",
+                "interval": "epoch",
+            },
+        }
 
     def training_step(self, batch, _):
         ids, labels = batch["ids"], batch["labels"]
         output = self(ids)
         loss = self.criterion(output, labels)
         return loss
+
+    def validation_step(self, batch, _):
+        ids, labels = batch["ids"], batch["labels"]
+        output = self(ids)
+        loss = self.criterion(output, labels)
+        return {"loss": loss, "outputs": torch.sigmoid(output), "labels": labels}
+
+    def validation_epoch_end(self, out):
+        loss = torch.stack([x["loss"] for x in out]).mean()
+        output = torch.cat([x["outputs"] for x in out])
+        labels = torch.cat([x["labels"] for x in out])
+        f1 = f1_score(preds=output, target=labels.int())
+        self.log("val/val_loss", loss, prog_bar=True, on_epoch=True, on_step=False)
+        self.log("val/val_f1", f1, prog_bar=True, on_epoch=True, on_step=False)
 
 
 class Base(LightningModule):
