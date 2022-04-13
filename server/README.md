@@ -2,6 +2,8 @@
 
 [Official server design](https://erisk.irlab.org/server.html)
 
+❗ Use with `../notebooks/server_test.ipynb`
+
 Install:
 
 - faker
