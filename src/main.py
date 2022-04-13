@@ -9,14 +9,12 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks.lr_monitor import LearningRateMonitor
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
-from pytorch_lightning.profiler import SimpleProfiler
-from pytorch_lightning.profiler.advanced import AdvancedProfiler
-from transformers import RobertaTokenizerFast, logging
+from transformers import logging
 from whos_there.callback import NotificationCallback
 from whos_there.senders.discord import DiscordSender
 
 from data import DataModule
-from models import DistilRoBERTa, RoBERTa
+from models import Transformer
 
 # logging.set_verbosity_warning()
 logging.set_verbosity_error()
@@ -28,12 +26,13 @@ config = dotenv_values(".env")
 
 BATCH_SIZE = 2
 NW = 8
-EPOCHS = 20
+EPOCHS = 1
 web_hook = config["DISCORD_WEBHOOK"]
 
 
 if __name__ == "__main__":
     model_name = "roberta"
+
     tokenizer_path = r"models/roberta-tokenizer"
     params = {
         "batch_size": BATCH_SIZE,
@@ -41,40 +40,34 @@ if __name__ == "__main__":
         "model_name": model_name,
         "roberta_pretrained_path": tokenizer_path,
     }
-    # data = DataModule(
-    #     ground_truth="risk_golden_truth.txt", folder="processed", **params
-    # )
     data = DataModule(
         ground_truth="risk_golden_truth_chunks.txt", folder="chunked", **params
     )
 
-    model = RoBERTa(model_name)
-
-    logger = TensorBoardLogger("logs", name=f"model_{model_name}")
+    model = Transformer()
     trainer = Trainer(
         # fast_dev_run=True,
         detect_anomaly=True,
-        gpus=1,
-        logger=logger,
+        # gpus=1,
+        logger=TensorBoardLogger("logs", name=f"model_{model_name}"),
         max_epochs=EPOCHS,
-        accumulate_grad_batches=2,
         callbacks=[
-            ModelCheckpoint(
-                monitor="val/val_loss",
-                mode="min",
-                dirpath=f"models/{model_name}_3",
-                filename="bert-val_loss{val/val_loss:.2f}",
-                auto_insert_metric_name=False,
-            ),
-            NotificationCallback(
-                senders=[
-                    DiscordSender(
-                        webhook_url=web_hook,
-                    )
-                ]
-            ),
-            # LearningRateMonitor(logging_interval="step"),
-            EarlyStopping(monitor="val/val_loss", patience=5),
+            # ModelCheckpoint(
+            #     monitor="val/val_loss",
+            #     mode="min",
+            #     dirpath=f"models/{model_name}_3",
+            #     filename="bert-val_loss{val/val_loss:.2f}",
+            #     auto_insert_metric_name=False,
+            # ),
+            # NotificationCallback(
+            #     senders=[
+            #         DiscordSender(
+            #             webhook_url=web_hook,
+            #         )
+            #     ]
+            # ),
+            # # LearningRateMonitor(logging_interval="step"),
+            # EarlyStopping(monitor="val/val_loss", patience=5),
         ],
     )
     trainer.fit(model, data)

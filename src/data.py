@@ -42,15 +42,16 @@ class BaseDataset(Dataset):
             text = " ".join(f.readlines())
         text = self.tokenizer.encode_plus(
             text,
-            add_special_tokens=True,
+            # add_special_tokens=True,
             max_length=512,
             padding="max_length",
             # return_tensors="pt",
+            return_attention_mask=False,
             truncation=True,
         )
         return {
             "ids": torch.tensor(text["input_ids"], dtype=torch.long),
-            "mask": torch.tensor(text["attention_mask"], dtype=torch.long),
+            # "mask": torch.tensor(text["attention_mask"], dtype=torch.long),
             "labels": torch.tensor(int(label), dtype=torch.float),
         }
 
