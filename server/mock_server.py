@@ -38,6 +38,6 @@ def hello_world():
         number += 1
         return jsonify(writings)
     if request.method == "POST":
-        data = request.form
+        data = request.get_json()
         print(data)
         return jsonify({"message": "Success"})
