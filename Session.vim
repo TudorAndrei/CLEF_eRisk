@@ -9,13 +9,13 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 let s:shortmess_save = &shortmess
 set shortmess=aoO
-badd +75 ~/projects/erisk/src/data.py
-badd +1 ~/projects/erisk/src/main.py
-badd +57 ~/projects/erisk/src/models.py
-badd +1 utils.py
+badd +42 src/data.py
+badd +42 src/main.py
+badd +42 src/models.py
+badd +6 term://~/projects/erisk//684403:python3\ -m\ pydoc\ \'\ \ \ \ \ \ \ \ },\'
 argglobal
 %argdel
-edit ~/projects/erisk/src/main.py
+edit src/main.py
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
@@ -35,7 +35,7 @@ set winwidth=1
 exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
 exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)
 argglobal
-balt ~/projects/erisk/src/data.py
+balt src/data.py
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -44,21 +44,29 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-29
+38
 normal! zo
-let s:l = 43 - ((30 * winheight(0) + 24) / 49)
+38
+normal! zo
+52
+normal! zo
+77
+normal! zo
+82
+normal! zo
+let s:l = 45 - ((20 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 43
-normal! 0
+keepjumps 45
+normal! 09|
 wincmd w
 argglobal
-if bufexists(fnamemodify("~/projects/erisk/src/models.py", ":p")) | buffer ~/projects/erisk/src/models.py | else | edit ~/projects/erisk/src/models.py | endif
+if bufexists(fnamemodify("src/models.py", ":p")) | buffer src/models.py | else | edit src/models.py | endif
 if &buftype ==# 'terminal'
-  silent file ~/projects/erisk/src/models.py
+  silent file src/models.py
 endif
-balt ~/projects/erisk/src/main.py
+balt src/main.py
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -69,36 +77,28 @@ setlocal fdn=20
 setlocal fen
 22
 normal! zo
-43
+23
 normal! zo
-91
+41
 normal! zo
-101
+51
 normal! zo
-111
+74
 normal! zo
-112
-normal! zc
-111
-normal! zc
-129
+96
 normal! zo
-130
-normal! zc
-137
-normal! zc
-140
-normal! zc
-143
-normal! zc
-129
-normal! zc
-let s:l = 57 - ((24 * winheight(0) + 24) / 49)
+115
+normal! zo
+118
+normal! zo
+148
+normal! zo
+let s:l = 106 - ((11 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 57
-normal! 044|
+keepjumps 106
+normal! 027|
 wincmd w
 exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
 exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)

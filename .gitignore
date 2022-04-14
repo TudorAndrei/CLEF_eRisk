@@ -131,3 +131,5 @@ dmypy.json
 # Project files
 data/
 logs/
+models/
+wandb/
