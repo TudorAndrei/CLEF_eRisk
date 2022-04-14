@@ -103,6 +103,7 @@ class Transformer(LightningModule):
         dropout=0.2,  # dropout probability
     ) -> None:
         super().__init__()
+        self.save_hyperparameters()
         self.model = TransformerModel(ntokens, emsize, nhead, d_hid, nlayers, dropout)
         self.criterion = BCEWithLogitsLoss()
         self.lr = 0.03
