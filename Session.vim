@@ -10,9 +10,8 @@ endif
 let s:shortmess_save = &shortmess
 set shortmess=aoO
 badd +42 src/data.py
-badd +42 src/main.py
-badd +42 src/models.py
-badd +6 term://~/projects/erisk//684403:python3\ -m\ pydoc\ \'\ \ \ \ \ \ \ \ },\'
+badd +50 src/main.py
+badd +144 src/models.py
 argglobal
 %argdel
 edit src/main.py
@@ -44,22 +43,22 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-38
+39
 normal! zo
-38
+39
 normal! zo
-52
-normal! zo
-77
+57
 normal! zo
 82
 normal! zo
-let s:l = 45 - ((20 * winheight(0) + 24) / 49)
+87
+normal! zo
+let s:l = 74 - ((37 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 45
-normal! 09|
+keepjumps 74
+normal! 05|
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/models.py", ":p")) | buffer src/models.py | else | edit src/models.py | endif
@@ -75,30 +74,30 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-22
+18
 normal! zo
-23
+19
 normal! zo
-41
+37
 normal! zo
-51
+47
 normal! zo
-74
+70
 normal! zo
-96
+92
 normal! zo
-115
+111
 normal! zo
-118
+114
 normal! zo
-148
+144
 normal! zo
-let s:l = 106 - ((11 * winheight(0) + 24) / 49)
+let s:l = 104 - ((29 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 106
-normal! 027|
+keepjumps 104
+normal! 039|
 wincmd w
 exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
 exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)

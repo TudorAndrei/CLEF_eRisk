@@ -1,19 +1,15 @@
 import math
-from copy import deepcopy
-from os import path as osp
-from typing import Any, Dict, List, Type
 
 import torch
 from pytorch_lightning import LightningModule
 from torch import Tensor
-from torch.nn import Dropout, Linear, Module, ReLU, Sequential
-from torch.nn.functional import nll_loss
+from torch.nn import Dropout, Linear, Module
 from torch.nn.modules.loss import BCEWithLogitsLoss
 from torch.nn.modules.sparse import Embedding
-from torch.nn.modules.transformer import TransformerEncoder, TransformerEncoderLayer
+from torch.nn.modules.transformer import (TransformerEncoder,
+                                          TransformerEncoderLayer)
 from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-
 # from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchmetrics.functional.classification.f_beta import f1_score
 
@@ -46,7 +42,7 @@ class TransformerModel(torch.nn.Module):
         d_hid: int,
         nlayers: int,
         dropout: float = 0.5,
-        seq_len: int = 512,
+        # seq_len: int = 512,
     ):
         super().__init__()
         self.model_type = "Transformer"
@@ -145,7 +141,7 @@ class Transformer(LightningModule):
 
 
 class Base(LightningModule):
-    def __init__(self, model_name: str = None, local_model: bool = False) -> None:
+    def __init__(self, model_name: str) -> None:
         super().__init__()
         self.bert_output_size = 768
         print(model_name)

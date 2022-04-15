@@ -8,7 +8,7 @@ from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks.lr_monitor import LearningRateMonitor
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
-from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
+from pytorch_lightning.loggers import WandbLogger
 from transformers import logging
 from whos_there.callback import NotificationCallback
 from whos_there.senders.discord import DiscordSender
@@ -30,24 +30,24 @@ EPOCHS = 100
 web_hook = config["DISCORD_WEBHOOK"]
 
 sweep_config = {
-  "method": "bayes",   # Random search
-  "metric": {           # We want to maximize val_acc
-      "name": "val/val_acc",
+  "method": "random",
+  "metric": {
+      "name": "val/val_f1",
       "goal": "minimize"
   },
   "parameters": {
         "emsize": {
-            "values": [32, 64, 128]
+            "values": [64, 128]
         },
         "d_hid": {
-            "values": [32, 64, 128]
+            "values": [64, 128]
         },
 
         "nlayers": {
-            "values": [1,2,3]
+            "values": [1]
         },
         "nhead": {
-            "values": [1,2,4]
+            "values": [1, 2, 4]
         },
     }
 }
@@ -72,7 +72,6 @@ def sweep_iteration():
         "nhead": wandb.config.nhead,
         "dropout": 0.2,
     }
-
     data = DataModule(
         ground_truth="risk_golden_truth_chunks.txt", folder="chunked", **params
     )
