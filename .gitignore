@@ -133,3 +133,4 @@ data/
 logs/
 models/
 wandb/
+Session.vim

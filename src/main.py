@@ -75,7 +75,7 @@ def sweep_iteration():
     data = DataModule(
         ground_truth="risk_golden_truth_chunks.txt", folder="chunked", **params
     )
-    version = len(glob.glob("model/trans*"))
+    version = len(glob.glob("models/trans*"))
     model = Transformer(**model_params)
     trainer = Trainer(
         # fast_dev_run=True,
