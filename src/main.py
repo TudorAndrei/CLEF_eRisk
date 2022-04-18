@@ -30,34 +30,22 @@ EPOCHS = 100
 web_hook = config["DISCORD_WEBHOOK"]
 
 sweep_config = {
-  "method": "random",
-  "metric": {
-      "name": "val/val_f1",
-      "goal": "minimize"
-  },
-  "parameters": {
-        "emsize": {
-            "values": [64, 128]
-        },
-        "d_hid": {
-            "values": [64, 128]
-        },
-
-        "nlayers": {
-            "values": [1]
-        },
-        "nhead": {
-            "values": [1, 2, 4]
-        },
-    }
+    "method": "grid",
+    "metric": {"name": "val/val_f1", "goal": "minimize"},
+    "parameters": {
+        "emsize": {"values": [64, 128, 256]},
+        "d_hid": {"values": [128]},
+        "nlayers": {"values": [1]},
+        "nhead": {"values": [4]},
+    },
 }
 
 
 def sweep_iteration():
     model_name = "transformer"
     tokenizer_path = r"models/roberta-tokenizer"
-    wandb.init()    # required to have access to `wandb.config`
-    logger= WandbLogger()
+    wandb.init()
+    logger = WandbLogger()
     params = {
         "batch_size": BATCH_SIZE,
         "num_workers": NW,
@@ -76,6 +64,7 @@ def sweep_iteration():
         ground_truth="risk_golden_truth_chunks.txt", folder="chunked", **params
     )
     version = len(glob.glob("models/trans*"))
+    wandb.run.name = f"{model_name}_{version}"
     model = Transformer(**model_params)
     trainer = Trainer(
         # fast_dev_run=True,
@@ -88,15 +77,16 @@ def sweep_iteration():
                 monitor="val/val_loss",
                 mode="min",
                 dirpath=f"models/{model_name}_{version}",
-                filename="model-{epoch:02d}-{val_loss:.2f}",
+                filename="model-{epoch:02d}-{val/val_loss:.2f}",
                 auto_insert_metric_name=False,
             ),
-            # NotificationCallback(senders=[DiscordSender(webhook_url=web_hook)]),
-            # LearningRateMonitor(logging_interval="step"),
-            EarlyStopping(monitor="val/val_loss", patience=10),
+            NotificationCallback(senders=[DiscordSender(webhook_url=web_hook)]),
+            LearningRateMonitor(logging_interval="step"),
+            EarlyStopping(monitor="val/val_loss", patience=15),
         ],
     )
     trainer.fit(model, data)
+
 
 if __name__ == "__main__":
     sweep_id = wandb.sweep(sweep_config, project="erisk")
