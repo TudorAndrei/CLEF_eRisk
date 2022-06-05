@@ -2,21 +2,9 @@
 # Structure
 
 ```
-├── Makefile                <- tasks
-├── data
-│   ├── raw
-│   │   ├── subjectX.xml
-│   │   └── subjectX.xml
-│   └── risk_golden_truth.txt
+├── Makefile
 ├── README.md
-├── logs
+├── server <- a barebones implementation of the official server used for testing
 ├── src <- source code
-├── results
-│   ├── outputs
-│   └── models
-├── docs
-│   ├── images
-│   └── references
-├── models <- serialized models
 └── notebooks
 ````
