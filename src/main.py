@@ -25,7 +25,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 seed_everything(42)
 
 BATCH_SIZE = 32
-NW = 8
+NW = 16
 EPOCHS = 100
 web_hook = config["DISCORD_WEBHOOK"]
 
@@ -33,9 +33,9 @@ sweep_config = {
     "method": "grid",
     "metric": {"name": "val/val_f1", "goal": "minimize"},
     "parameters": {
-        "emsize": {"values": [64, 128, 256]},
+        "emsize": {"values": [256]},
         "d_hid": {"values": [128]},
-        "nlayers": {"values": [1]},
+        "nlayers": {"values": [3]},
         "nhead": {"values": [4]},
     },
 }

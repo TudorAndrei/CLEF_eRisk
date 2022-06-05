@@ -6,10 +6,10 @@ from torch import Tensor
 from torch.nn import Dropout, Linear, Module
 from torch.nn.modules.loss import BCEWithLogitsLoss
 from torch.nn.modules.sparse import Embedding
-from torch.nn.modules.transformer import (TransformerEncoder,
-                                          TransformerEncoderLayer)
+from torch.nn.modules.transformer import TransformerEncoder, TransformerEncoderLayer
 from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+
 # from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchmetrics.functional.classification.f_beta import f1_score
 
@@ -123,7 +123,15 @@ class Transformer(LightningModule):
         ids, labels = batch["ids"], batch["labels"]
         output = self(ids)
         loss = self.criterion(output, labels)
-        return loss
+        return {"loss": loss, "outputs": torch.sigmoid(output), "labels": labels}
+
+    def training_epoch_end(self, out):
+        loss = torch.stack([x["loss"] for x in out]).mean()
+        output = torch.cat([x["outputs"] for x in out])
+        labels = torch.cat([x["labels"] for x in out])
+        f1 = f1_score(preds=output, target=labels.int())
+        self.log("train/train_loss", loss, prog_bar=True, on_epoch=True, on_step=False)
+        self.log("train/train_f1", f1, prog_bar=True, on_epoch=True, on_step=False)
 
     def validation_step(self, batch, _):
         ids, labels = batch["ids"], batch["labels"]
